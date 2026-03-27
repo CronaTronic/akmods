@@ -187,6 +187,7 @@ jobs:
         if: contains(fromJson('["schedule", "workflow_dispatch", "merge_group"]'), github.event_name)
         run: |
           OWNER_LC=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          echo "OWNER_LC=${OWNER_LC}" >> $GITHUB_ENV
           IMAGE_NAME="${{ inputs.akmods_target != 'common' && format('akmods-{0}', inputs.akmods_target) || 'akmods' }}"
           MANIFEST_TAG="${{ inputs.kernel_flavor }}-${{ inputs.version }}"
           KERNEL_RELEASE="$(jq -r '.kernel_release' < "$GITHUB_WORKSPACE/build/${{ env.AKMODS_KERNEL }}-${{ env.AKMODS_VERSION }}/KCWD/rpms/cache.json" | sed 's/\.x86_64\|\.aarch64//g')"
@@ -228,12 +229,13 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ github.token }}
+          authfile: ${{ runner.temp }}/auth.json
 
       - name: Attest Manifest Image
         if: contains(fromJson('["schedule", "workflow_dispatch", "merge_group"]'), github.event_name)
         uses: actions/attest-build-provenance@a2bbfa25375fe432b6a289bc6b6cd05ecd0c4c32 # v4
         with:
-          subject-name: ghcr.io/${{ github.repository_owner }}/${{ steps.digest.outputs.image_name }}
+          subject-name: ghcr.io/${{ env.OWNER_LC }}/${{ steps.digest.outputs.image_name }}
           subject-digest: ${{ steps.digest.outputs.manifest }}
           push-to-registry: true
 
@@ -241,6 +243,6 @@ jobs:
         if: contains(fromJson('["schedule", "workflow_dispatch", "merge_group"]'), github.event_name)
         uses: actions/attest-build-provenance@a2bbfa25375fe432b6a289bc6b6cd05ecd0c4c32 # v4
         with:
-          subject-name: ghcr.io/${{ github.repository_owner }}/${{ steps.digest.outputs.image_name }}
+          subject-name: ghcr.io/${{ env.OWNER_LC }}/${{ steps.digest.outputs.image_name }}
           subject-digest: ${{ steps.digest.outputs.manifest_kernel }}
           push-to-registry: true
