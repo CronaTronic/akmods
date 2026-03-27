@@ -199,9 +199,30 @@ jobs:
 
           echo "image_name=${IMAGE_NAME}" >> "$GITHUB_OUTPUT"
 
-      - name: Login to GHCR for Attestation
-        if: contains(fromJson('["schedule", "workflow_dispatch", "merge_group"]'), github.event_name)
-        uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4.0.0
+      - name: Detect Container Engine
+        id: engine
+        shell: bash
+        run: |
+          if command -v docker &> /dev/null; then
+            echo "client=docker" >> $GITHUB_OUTPUT
+          elif command -v podman &> /dev/null; then
+            echo "client=podman" >> $GITHUB_OUTPUT
+          else
+            echo "Error: Neither Docker nor Podman found."
+            exit 1
+          fi
+
+      - name: Login to GHCR for Attestation (Docker)
+        if: steps.engine.outputs.client == 'docker'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Login to GHCR for Attestation (Podman)
+        if: steps.engine.outputs.client == 'podman'
+        uses: redhat-actions/podman-login@v1
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
