@@ -108,16 +108,16 @@ jobs:
             ${{ matrix.architecture }}-${{ env.KCKEY }}
             ${{ matrix.architecture }}-${{ env.AKMODS_KERNEL }}
 
-      - name: Retrieve Signing Key
-        if: contains(fromJson('["schedule", "workflow_dispatch", "merge_group"]'), github.event_name)
-        shell: bash
-        run: |
-          mkdir -p certs
-          echo "${{ secrets.KERNEL_PRIVKEY }}" > certs/private_key.priv
-          echo "${{ secrets.AKMOD_PRIVKEY_20230518 }}" > certs/private_key_2.priv
-          # DEBUG: get character count of key
-          wc -c certs/private_key.priv
-          wc -c certs/private_key_2.priv
+      # - name: Retrieve Signing Key
+      #   if: contains(fromJson('["schedule", "workflow_dispatch", "merge_group"]'), github.event_name)
+      #   shell: bash
+      #   run: |
+      #     mkdir -p certs
+      #     echo "${{ secrets.KERNEL_PRIVKEY }}" > certs/private_key.priv
+      #     echo "${{ secrets.AKMOD_PRIVKEY_20230518 }}" > certs/private_key_2.priv
+      #     # DEBUG: get character count of key
+      #     wc -c certs/private_key.priv
+      #     wc -c certs/private_key_2.priv
 
       - name: Test Image
         run: just test

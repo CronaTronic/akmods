@@ -82,16 +82,16 @@ jobs:
           path: ${{ steps.kernel-version.outputs.KCPATH }}
           key: ${{ matrix.architecture }}-${{ inputs.kernel_flavor }}-${{ steps.kernel-version.outputs.kernel_major_minor_patch }} # job outputs KCKEY
 
-      - name: Retrieve Signing Key
-        if: contains(fromJSON('["schedule", "workflow_dispatch", "merge_group"]'), github.event_name) && steps.cache-kernel.outputs.cache-hit != 'true'
-        shell: bash
-        run: |
-          mkdir -p certs
-          echo "${{ secrets.KERNEL_PRIVKEY }}" > certs/private_key.priv
-          echo "${{ secrets.AKMOD_PRIVKEY_20230518 }}" > certs/private_key_2.priv
-          # DEBUG: get character count of key
-          wc -c certs/private_key.priv
-          wc -c certs/private_key_2.priv
+      # - name: Retrieve Signing Key
+      #   if: contains(fromJSON('["schedule", "workflow_dispatch", "merge_group"]'), github.event_name) && steps.cache-kernel.outputs.cache-hit != 'true'
+      #   shell: bash
+      #   run: |
+      #     mkdir -p certs
+      #     echo "${{ secrets.KERNEL_PRIVKEY }}" > certs/private_key.priv
+      #     echo "${{ secrets.AKMOD_PRIVKEY_20230518 }}" > certs/private_key_2.priv
+      #     # DEBUG: get character count of key
+      #     wc -c certs/private_key.priv
+      #     wc -c certs/private_key_2.priv
 
       - name: Fetch Kernel
         if: steps.cache-kernel.outputs.cache-hit != 'true'
