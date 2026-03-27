@@ -140,7 +140,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build-akmods]
     env:
-      REGISTRY_AUTH_FILE: ${{ runner.temp }}/auth.json
+      REGISTRY_AUTH_FILE: /tmp/auth.json
     container:
       image: "ghcr.io/ublue-os/devcontainer:latest"
       options: "--privileged --volume /var/lib/containers:/var/lib/containers --security-opt seccomp=unconfined --security-opt label=disable --user 0:0"
