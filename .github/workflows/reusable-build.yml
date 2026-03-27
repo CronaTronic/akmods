@@ -139,6 +139,8 @@ jobs:
     name: "Generate ${{ inputs.akmods_target != 'common' && format('akmods-{0}', inputs.akmods_target) || 'akmods' }}:${{ inputs.kernel_flavor }}-${{ inputs.version }} Manifest"
     runs-on: ubuntu-latest
     needs: [build-akmods]
+    env:
+      REGISTRY_AUTH_FILE: ${{ runner.temp }}/auth.json
     container:
       image: "ghcr.io/ublue-os/devcontainer:latest"
       options: "--privileged --volume /var/lib/containers:/var/lib/containers --security-opt seccomp=unconfined --security-opt label=disable --user 0:0"
@@ -229,7 +231,6 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ github.token }}
-          authfile: ${{ runner.temp }}/auth.json
 
       - name: Attest Manifest Image
         if: contains(fromJson('["schedule", "workflow_dispatch", "merge_group"]'), github.event_name)
